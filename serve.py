@@ -9,6 +9,8 @@ import os
 from sklearn.linear_model import LinearRegression
 import uuid
 from functools import lru_cache
+from collections import defaultdict
+import time
 
 MODEL_VERSION = "v1.0-fallback"
 
@@ -20,6 +22,10 @@ logging.basicConfig(
 
 # 检查是否存在模型文件，如果没有则训练一个模型
 model_path = "model.pkl"
+
+rate_limit = defaultdict(list)
+MAX_REQUESTS = 5
+WINDOW_SECONDS = 60
 
 if not os.path.exists(model_path):
     logging.info("🚧 model.pkl not found. Training a simple fallback model...")
@@ -57,6 +63,18 @@ def cached_predict(feature_tuple):
 
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
+ip = request.client.host
+now = time.time()
+
+# 清除过期时间戳
+rate_limit[ip] = [t for t in rate_limit[ip] if now - t < WINDOW_SECONDS]
+
+if len(rate_limit[ip]) >= MAX_REQUESTS:
+    raise HTTPException(status_code=429, detail="Too many requests - rate limit exceeded.")
+
+# 记录当前请求时间
+rate_limit[ip].append(now)
+
     start_time = time.time()
     trace_id = str(uuid.uuid4())[:8]  # 简洁一点
 
