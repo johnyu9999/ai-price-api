@@ -39,6 +39,14 @@ class PredictRequest(BaseModel):
 # 初始化 FastAPI 应用
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "API is live."}
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "healthy"}
+
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
     start_time = time.time()
