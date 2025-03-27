@@ -81,17 +81,17 @@ async def predict(request: Request, body: PredictRequest):
         if len(body.features) != 3:
             raise HTTPException(status_code=400, detail="❌ 输入 features 必须包含 3 个数字。")
 
-    try:
-        feature_tuple = tuple(body.features)
-        prediction = cached_predict(feature_tuple)
-        duration = (time.time() - start_time) * 1000
-        logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={prediction:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
-        return {
+    	try:
+            feature_tuple = tuple(body.features)
+            prediction = cached_predict(feature_tuple)
+            duration = (time.time() - start_time) * 1000
+            logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={prediction:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
+            return {
                 "predicted_price": round(prediction, 2),
                 "model_version": MODEL_VERSION,
                 "trace_id": trace_id
-        }
-    except Exception as e:
+            }
+        except Exception as e:
         logging.error(f"Prediction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
