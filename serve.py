@@ -8,6 +8,7 @@ import logging
 import os
 from sklearn.linear_model import LinearRegression
 import uuid
+from functools import lru_cache
 
 MODEL_VERSION = "v1.0-fallback"
 
@@ -49,6 +50,11 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+@lru_cache(maxsize=128)
+def cached_predict(feature_tuple):
+    X = np.array([feature_tuple])
+    return model.predict(X)[0]
+
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
     start_time = time.time()
@@ -58,12 +64,12 @@ async def predict(request: Request, body: PredictRequest):
         raise HTTPException(status_code=400, detail="❌ 输入 features 必须包含 3 个数字。")
 
     try:
-        X = np.array([body.features])
-        y_pred = model.predict(X)
+        feature_tuple = tuple(body.features)
+        prediction = cached_predict(feature_tuple)
         duration = (time.time() - start_time) * 1000
         logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
         return {
-                "predicted_price": round(y_pred[0], 2),
+                "predicted_price": round(prediction, 2)
                 "model_version": MODEL_VERSION,
                 "trace_id": trace_id
         }
