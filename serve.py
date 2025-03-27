@@ -7,6 +7,7 @@ import time
 import logging
 import os
 from sklearn.linear_model import LinearRegression
+import uuid
 
 MODEL_VERSION = "v1.0-fallback"
 
@@ -51,6 +52,7 @@ def health_check():
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
     start_time = time.time()
+    trace_id = str(uuid.uuid4())[:8]  # 简洁一点
 
     if len(body.features) != 3:
         raise HTTPException(status_code=400, detail="❌ 输入 features 必须包含 3 个数字。")
@@ -59,10 +61,11 @@ async def predict(request: Request, body: PredictRequest):
         X = np.array([body.features])
         y_pred = model.predict(X)
         duration = (time.time() - start_time) * 1000
-        logging.info(f"{request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
-        return {
-		"predicted_price": round(y_pred[0], 2),
-		"model_version": MODEL_VERSION
+	logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
+	return {
+    		"predicted_price": round(y_pred[0], 2),
+    		"model_version": MODEL_VERSION,
+    		"trace_id": trace_id
 	}
     except Exception as e:
         logging.error(f"Prediction failed: {str(e)}")
