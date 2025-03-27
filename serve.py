@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List
@@ -8,6 +7,8 @@ import time
 import logging
 import os
 from sklearn.linear_model import LinearRegression
+
+MODEL_VERSION = "v1.0-fallback"
 
 # 初始化日志系统
 logging.basicConfig(
@@ -58,8 +59,11 @@ async def predict(request: Request, body: PredictRequest):
         X = np.array([body.features])
         y_pred = model.predict(X)
         duration = (time.time() - start_time) * 1000
-        logging.info(f"{request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} ({duration:.1f} ms)")
-        return {"predicted_price": round(y_pred[0], 2)}
+        logging.info(f"{request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
+        return {
+		"predicted_price": round(y_pred[0], 2),
+		"model_version": MODEL_VERSION
+	}
     except Exception as e:
         logging.error(f"Prediction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
