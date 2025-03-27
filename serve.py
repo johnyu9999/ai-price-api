@@ -61,7 +61,7 @@ async def predict(request: Request, body: PredictRequest):
         X = np.array([body.features])
         y_pred = model.predict(X)
         duration = (time.time() - start_time) * 1000
-	logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
+        logging.info(f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={y_pred[0]:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)")
 	return {
     		"predicted_price": round(y_pred[0], 2),
     		"model_version": MODEL_VERSION,
