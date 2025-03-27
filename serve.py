@@ -63,23 +63,23 @@ def cached_predict(feature_tuple):
 
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
-ip = request.client.host
-now = time.time()
+        ip = request.client.host
+        now = time.time()
 
-# 清除过期时间戳
-rate_limit[ip] = [t for t in rate_limit[ip] if now - t < WINDOW_SECONDS]
+        # 清除过期时间戳
+        rate_limit[ip] = [t for t in rate_limit[ip] if now - t < WINDOW_SECONDS]
 
-if len(rate_limit[ip]) >= MAX_REQUESTS:
-    raise HTTPException(status_code=429, detail="Too many requests - rate limit exceeded.")
+        if len(rate_limit[ip]) >= MAX_REQUESTS:
+            raise HTTPException(status_code=429, detail="Too many requests - rate limit exceeded.")
 
-# 记录当前请求时间
-rate_limit[ip].append(now)
+        # 记录当前请求时间
+        rate_limit[ip].append(now)
 
-    start_time = time.time()
-    trace_id = str(uuid.uuid4())[:8]  # 简洁一点
+        start_time = time.time()
+        trace_id = str(uuid.uuid4())[:8]  # 简洁一点
 
-    if len(body.features) != 3:
-        raise HTTPException(status_code=400, detail="❌ 输入 features 必须包含 3 个数字。")
+        if len(body.features) != 3:
+            raise HTTPException(status_code=400, detail="❌ 输入 features 必须包含 3 个数字。")
 
     try:
         feature_tuple = tuple(body.features)
