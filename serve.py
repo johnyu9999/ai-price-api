@@ -89,7 +89,10 @@ def switch_model(version: str = Query(..., description="Target model version to 
     try:
         logging.info(f"🔄 Received request to switch model to version: {version}")
 
+        start = time.time()
         new_model = load_model(version)
+        duration_ms = int((time.time() - start) * 1000)
+        log_switch_to_file(model_version, version, duration_ms)
         model = new_model
         model_version = version
 
@@ -107,3 +110,14 @@ def switch_model(version: str = Query(..., description="Target model version to 
     except Exception as e:
         logging.exception("❌ Unexpected error during model switch")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+def log_switch_to_file(from_version: str, to_version: str, duration_ms: int):
+    log_entry = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "action": "switch",
+        "from": from_version,
+        "to": to_version,
+        "duration_ms": duration_ms
+    }
+    with open("model_switch_log.jsonl", "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
