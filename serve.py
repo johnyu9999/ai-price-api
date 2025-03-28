@@ -83,6 +83,7 @@ async def predict(request: Request, body: PredictRequest):
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 router = APIRouter()
+app.include_router(router)
 
 @router.post("/switch_model")
 def switch_model(version: str = Query(..., description="Target model version to switch to")):
