@@ -12,7 +12,14 @@ from functools import lru_cache
 from collections import defaultdict
 import time
 
-MODEL_VERSION = "v1.0-fallback"
+def load_model(version: str):
+    model_path = f"model_registry/model_{version}.pkl"
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found for version '{version}': {model_path}")
+    
+    model = joblib.load(model_path)
+    return model
+
 
 # 初始化日志系统
 logging.basicConfig(
@@ -20,25 +27,13 @@ logging.basicConfig(
 )
 
 # 检查是否存在模型文件，如果没有则训练一个模型
-model_path = "model.pkl"
 
 rate_limit = defaultdict(list)
 MAX_REQUESTS = 5
 WINDOW_SECONDS = 60
-
-if not os.path.exists(model_path):
-    logging.info("🚧 model.pkl not found. Training a simple fallback model...")
-    np.random.seed(42)
-    X = np.random.rand(100, 3)
-    weights = np.array([1.5, -2.0, 3.0])
-    y = X @ weights + 4.2 + np.random.randn(100) * 0.1
-    model = LinearRegression()
-    model.fit(X, y)
-    joblib.dump(model, model_path)
-    logging.info("✅ Fallback model trained and saved to model.pkl")
-else:
-    model = joblib.load(model_path)
-    logging.info("✅ model.pkl loaded.")
+MODEL_VERSION = os.getenv("MODEL_VERSION", "v1")
+model = load_model(MODEL_VERSION)
+logging.info("✅ model.pkl loaded.")
 
 
 # 定义输入格式
