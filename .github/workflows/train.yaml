@@ -5,7 +5,7 @@ on:
     paths:
       - 'ml_pipeline/**'
       - 'train_and_register.py'
-      - '.github/workflows/train.yml'
+      - '.github/workflows/train.yaml'
     branches:
       - main
 
