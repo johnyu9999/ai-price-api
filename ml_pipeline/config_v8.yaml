@@ -1,0 +1,6 @@
+version: v8
+samples: 1000
+noise: 0.05
+weights: [1.5, -2.0, 3.0]
+bias: 4.2
+note: "more samples, less noise"
