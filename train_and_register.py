@@ -46,7 +46,7 @@ metadata_entry = {
     "note": note
 }
 
-with open("model_store/metadata.jsonl", "a") as f:
+with open("ml_pipeline/model_store/metadata.jsonl", "a") as f:
     f.write(json.dumps(metadata_entry) + "\n")
 
 print("📝 Metadata entry written.")
