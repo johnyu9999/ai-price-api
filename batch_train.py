@@ -2,7 +2,7 @@ import os
 import yaml
 import subprocess
 
-config_dir = "."
+config_dir = "ml_pipeline"
 configs = [f for f in os.listdir(config_dir) if f.startswith("config_") and f.endswith(".yaml")]
 
 for cfg_file in configs:
