@@ -4,6 +4,8 @@ import time
 import os
 import uuid
 import logging
+import model_holder
+
 from fastapi import FastAPI, HTTPException, Request, APIRouter, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -11,12 +13,11 @@ from typing import List
 from sklearn.linear_model import LinearRegression
 from functools import lru_cache
 from collections import defaultdict
-from model_holder import model, model_version
 from model_utils import load_model
 
 MODEL_VERSION = os.getenv("MODEL_VERSION", "v1")
-model = load_model(MODEL_VERSION)
-model_version = MODEL_VERSION
+model_holder.model = load_model(MODEL_VERSION)
+model_holder.model_version = MODEL_VERSION
 rate_limit = defaultdict(list)
 MAX_REQUESTS = 5
 WINDOW_SECONDS = 60
@@ -42,7 +43,7 @@ def health_check():
 @lru_cache(maxsize=128)
 def cached_predict(feature_tuple):
     X = np.array([feature_tuple])
-    return model.predict(X)[0]
+    return model_holder.model.predict(X)[0]
 
 @app.post("/predict")
 async def predict(request: Request, body: PredictRequest):
@@ -71,21 +72,18 @@ async def predict(request: Request, body: PredictRequest):
         prediction = cached_predict(feature_tuple)
         duration = (time.time() - start_time) * 1000
         logging.info(
-            f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={prediction:.2f} | version={MODEL_VERSION} ({duration:.1f} ms)"
+            f"[trace:{trace_id}] {request.client.host} called /predict with input={body.features} → output={prediction:.2f} | version={model_holder.model_version} ({duration:.1f} ms)"
         )
         return {
             "predicted_price": round(prediction, 2),
-            "model_version": model_version,
+            "model_version": model_holder.model_version,
             "trace_id": trace_id,
         }
     except Exception as e:
         logging.error(f"Prediction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
-router = APIRouter()
-app.include_router(router)
-
-@router.post("/switch_model")
+@app.post("/switch_model")
 def switch_model(version: str = Query(..., description="Target model version to switch to")):
     try:
         logging.info(f"🔄 Received request to switch model to version: {version}")
@@ -93,15 +91,15 @@ def switch_model(version: str = Query(..., description="Target model version to 
         start = time.time()
         new_model = load_model(version)
         duration_ms = int((time.time() - start) * 1000)
-        log_switch_to_file(model_version, version, duration_ms)
-        model = new_model
-        model_version = version
+        log_switch_to_file(model_holder.model_version, version, duration_ms)
+        model_holder.model = new_model
+        model_holder.model_version = version
 
         logging.info(f"✅ Model successfully switched to version: {version}")
 
         return {
             "message": f"Model switched to version {version}",
-            "current_version": model_version
+            "current_version": model_holder.model_version
         }
 
     except FileNotFoundError:
@@ -122,3 +120,9 @@ def log_switch_to_file(from_version: str, to_version: str, duration_ms: int):
     }
     with open("model_switch_log.jsonl", "a") as f:
         f.write(json.dumps(log_entry) + "\n")
+
+print("=== ROUTES LOADED ===")
+for route in app.routes:
+    print(f"{route.path} → {route.name}")
+
+print("✅ Running from serve.py")
