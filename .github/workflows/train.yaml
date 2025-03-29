@@ -28,4 +28,4 @@ jobs:
 
       - name: 🏋️‍♂️ Run training script
         run: |
-          python ml_pipeline/train_and_register.py
+          python train_and_register.py
