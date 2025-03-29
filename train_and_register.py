@@ -25,7 +25,7 @@ note = config.get("note", "")
 model = LinearRegression()
 model.fit(X, y)
 
-model_path = os.path.join("model_store", f"model_{version}.pkl")
+model_path = os.path.join("ml_pipeline", "model_store", f"model_{version}.pkl")
 joblib.dump(model, model_path)
 print(f"✅ Model {version} saved to {model_path}")
 
