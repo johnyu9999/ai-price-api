@@ -1,12 +1,25 @@
 from sklearn.linear_model import LinearRegression
 import joblib
 import os
-from datetime import datetime
-from data_generator import generate_linear_data
-
+import re
 import argparse
 import yaml
 import sys
+
+from datetime import datetime
+from data_generator import generate_linear_data
+
+def get_next_version(model_store_path="ml_pipeline/model_store"):
+    existing_files = os.listdir(model_store_path)
+    version_numbers = []
+
+    for filename in existing_files:
+        match = re.match(r"model_v(\d+)\.pkl", filename)
+        if match:
+            version_numbers.append(int(match.group(1)))
+
+    next_version = max(version_numbers, default=0) + 1
+    return f"v{next_version}"
 
 yaml_path = sys.argv[1] if len(sys.argv) > 1 else "ml_pipeline/config.yaml"
 with open(yaml_path, "r") as f:
@@ -19,7 +32,7 @@ X, y = generate_linear_data(
     noise_std=config["noise"]
 )
 
-version = config["version"]
+version = get_next_version()
 note = config.get("note", "")
 
 model = LinearRegression()
