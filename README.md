@@ -59,6 +59,10 @@ python ml_pipeline/train_and_register.py –version v3 –samples 200 –noise 0
 - Render deployment uses Dockerfile.
 
 ## Project Structure
+
+<details>
+<summary><strong>Project Structure</strong></summary>
+
 linear-regression-service/
 ├── app/
 │   ├── api/
@@ -91,6 +95,9 @@ linear-regression-service/
 ├── .gitignore
 ├── pytest.ini
 └── README.md
+
+</details>
+
 
 ## Requirements
 
