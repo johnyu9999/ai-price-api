@@ -18,10 +18,10 @@ def validate_model(model, X, y, version):
     try:
         y_pred = model.predict(X)
         mse = mean_squared_error(y, y_pred)
-        print(f"✅ Validation passed | MSE={mse:.4f}")
+        print(f"Validation passed | MSE={mse:.4f}")
         return True, mse
     except Exception as e:
-        print(f"❌ Validation failed: {e}")
+        print(f"Validation failed: {e}")
         return False, None
 
 def save_metadata(version, n_samples, n_features, noise, mse):
@@ -47,20 +47,20 @@ def main(args):
     model = LinearRegression()
     model.fit(X, y)
     model.fit(X, y)
-    _ = model.predict(X[:5])  # 让 model 的 predict 机制完整初始化
+    _ = model.predict(X[:5])
 
     # Validate before saving
     is_valid, mse = validate_model(model, X, y, args.version)
     if not is_valid:
-        print("🛑 Model validation failed. Not saving.")
+        print("Model validation failed. Not saving.")
         return
 
     model_path = MODEL_DIR / f"{args.version}.pkl"
     joblib.dump(model, model_path)
-    print(f"✅ Model saved to {model_path}")
+    print(f"Model saved to {model_path}")
 
     save_metadata(args.version, args.samples, args.features, args.noise, mse)
-    print(f"📝 Metadata logged to {META_PATH}")
+    print(f"Metadata logged to {META_PATH}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

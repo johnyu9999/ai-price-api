@@ -20,7 +20,7 @@ def cached_predict(feature_tuple):
         return model_holder.model.predict(X)[0]
 
     except Exception as e:
-        print("❌ Exception occurred in cached_predict():", e)
+        print("Exception occurred in cached_predict():", e)
         traceback.print_exc()
         raise
 

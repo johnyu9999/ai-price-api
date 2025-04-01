@@ -21,9 +21,9 @@ async def lifespan(app: FastAPI):
         model_holder.model = model
         model_holder.model_version = "v1"
         model_holder.input_dims = model.coef_.shape[0]
-        print("✅ Model loaded in lifespan")
+        print("Model loaded in lifespan")
     except Exception as e:
-        print("❌ Failed to load model during startup:", e)
+        print("Failed to load model during startup:", e)
         model_holder.model = None
 
     yield  # App is running

@@ -11,7 +11,4 @@ def load_model(version: str):
         raise FileNotFoundError(f"Model file not found for version '{version}': {model_path}")
 
     model = joblib.load(model_path)
-    print(f"✅ model loaded: {model}")
-    print(f"✅ coef_: {model.coef_}, intercept_: {model.intercept_}")
-    print("✅ model.predict call (sanity):", model.predict([[0.1, 0.2, 0.3]]))
     return model

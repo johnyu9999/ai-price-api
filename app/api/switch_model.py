@@ -14,7 +14,7 @@ def switch_model(version: str = Query(..., description="Target model version")):
         raise HTTPException(status_code=403, detail=f"Version '{version}' is frozen and cannot be used.")
 
     try:
-        logging.info(f"🔄 Switching to model version: {version}")
+        logging.info(f"Switching to model version: {version}")
         start = time.time()
         new_model = load_model(version)
         duration_ms = int((time.time() - start) * 1000)
