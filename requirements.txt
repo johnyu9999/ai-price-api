@@ -1,5 +1,7 @@
-numpy
+fastapi
+uvicorn
 scikit-learn
+numpy
 joblib
-matplotlib
-pyyaml
+pydantic
+pytest

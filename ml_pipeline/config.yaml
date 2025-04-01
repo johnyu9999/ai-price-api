@@ -1,6 +1,0 @@
-version: v6
-samples: 300
-noise: 0.1
-weights: [1.5, -2.0, 3.0]
-bias: 4.2
-note: "baseline config v6"
