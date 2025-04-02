@@ -42,7 +42,7 @@ This project demonstrates a production-grade FastAPI service for serving multipl
 ## Model Registry
 
 - Models are stored under `ml_pipeline/model_store/`.
-- Metadata is recorded in `metadata.jsonl`, including training info: version, date, weights, MSE, noise level, samples.
+- Metadata is recorded in `metadata.jsonl`, including training info: version, date, MSE, noise level, samples.
 
 ## Training Pipeline
 
@@ -60,9 +60,7 @@ python ml_pipeline/train_and_register.py –version v3 –samples 200 –noise 0
 
 ## Project Structure
 
-<details>
-<summary><strong>Project Structure</strong></summary>
-
+```
 linear-regression-service/
 ├── app/
 │   ├── api/
@@ -95,9 +93,7 @@ linear-regression-service/
 ├── .gitignore
 ├── pytest.ini
 └── README.md
-
-</details>
-
+```
 
 ## Requirements
 
