@@ -48,7 +48,9 @@ This project demonstrates a production-grade FastAPI service for serving multipl
 
 - Script: `ml_pipeline/train_and_register.py`
 - Configurable via command-line flags:
+```
 python ml_pipeline/train_and_register.py –version v3 –samples 200 –noise 0.2
+```
 
 - On success, stores model + metadata + triggers validation.
 
@@ -98,18 +100,24 @@ linear-regression-service/
 ## Requirements
 
 Install dependencies:
+```
 pip install -r requirements.txt
+```
 
 ## Docker
 
 Build and run locally:
+```
 docker build -t ml-api .
 docker run -p 8000:8000 ml-api
+```
 
 ## Testing
 
 Unit tests via pytest:
+```
 pytest
+```
 
 CI pipeline runs all tests automatically on GitHub.
 
